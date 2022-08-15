@@ -27,6 +27,8 @@ class RecipeController extends Controller
     public function create()
     {
         //
+        $ingradients = \App\Models\Ingradient::all();
+        return view('Racipe.create', ['ingradients' => $ingradients]);
     }
 
     /**
@@ -38,6 +40,23 @@ class RecipeController extends Controller
     public function store(Request $request)
     {
         //
+        $this->validate($request, [
+            'name' => 'required|string|max:255|min:3|alpha',
+            'description' => 'required|string',
+            'instruction' => 'required|string',
+            'ingradients' => 'required|array',
+        ]);
+
+        $recipe = Recipe::create(
+            [
+                'name'=> $request->name,
+                'description'=> $request->description,
+                'instruction' => $request->instruction,
+            ]
+        );
+
+        $recipe->ingradients()->attach($request->ingradients);
+        return redirect(route('recipes.index'));
     }
 
     /**
